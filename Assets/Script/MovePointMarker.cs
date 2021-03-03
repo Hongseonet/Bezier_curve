@@ -13,6 +13,8 @@ public class MovePointMarker : MonoBehaviour
     {
         mZCoord = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
         mOffset = gameObject.transform.position - GetMouseWorldPos();
+
+        Debug.LogWarning("MovePointMarker : " + pointID);
     }
 
     private Vector3 GetMouseWorldPos()

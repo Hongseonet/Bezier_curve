@@ -3,18 +3,21 @@ using UnityEngine;
 
 public class Bezier : MonoBehaviour
 {
-    enum lineTypeList { straight, curve, bezier };
+    enum lineTypeList { none, straight, curve, bezier };
     lineTypeList lineType;
 
     const int maxpoints = 10000;
     const int numpos = 20; //curved element : line renderer positions : 50
+    int cntDraw = 0; //how many draw?
     int addWeight = 0; //for stack count
     public LineRenderer lineRenderer;
     public GameObject Linepoint;
     public GameObject ControlPoint;
 
-    [SerializeField] List<GameObject> PointList = new List<GameObject>();
-    [SerializeField] List<GameObject> ControlPointList = new List<GameObject>();
+    //display inspector for debug
+    [SerializeField] List<GameObject> listPoint = new List<GameObject>();
+    [SerializeField] List<GameObject> listControlPoint = new List<GameObject>();
+    Dictionary<int, lineTypeList> dicPointType = new Dictionary<int, lineTypeList>();
 
     public Vector3 sizee;
     public Vector3 newPos, oldPos;
@@ -25,6 +28,7 @@ public class Bezier : MonoBehaviour
     void Start()
     {
         pos = new Vector3[maxpoints];
+        lineType = lineTypeList.none;
 
         lineRenderer.positionCount = 0;
         lineRenderer.startWidth = 0.1f;
@@ -34,26 +38,49 @@ public class Bezier : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
+            //for debug
+            foreach(KeyValuePair<int, lineTypeList> abc in dicPointType)
+                Debug.Log("a : " + abc.Key + " / " + abc.Value);
+        }
+        else if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift))
+        {
+            if (lineType == lineTypeList.none)
+                return;
+
             newPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             newPos.z = 0;
+
+            if(dicPointType.Count == 0) //head point
+                dicPointType.Add(cntDraw, lineType);
 
             if (CreatePointMarker(newPos) > 1)
             {
                 Debug.Log("create new point");
+                
+                //add lineType on hashmap
+                cntDraw++;
+                dicPointType.Add(cntDraw, lineType);
+                //end
 
                 switch (lineType)
                 {
                     case lineTypeList.straight:
+                        //DrawStraitghtCurve(oldPos, newPos);
                         break;
                     case lineTypeList.curve:
-                        drawSingleCurve(oldPos, newPos);
+                        DrawSingleCurve(oldPos, newPos);
                         break;
                     case lineTypeList.bezier:
-                        drawBezierCurve(oldPos, newPos);
+                        DrawBezierCurve(oldPos, newPos);
                         break;
                 }
+
+                if(lineType != lineTypeList.straight)
+                    addWeight += numpos; //eg 0, 20, 40 ...
+                else
+                    addWeight += 2; //eg 2, 4, 6 ...
             }
             oldPos = newPos;
         }
@@ -62,94 +89,113 @@ public class Bezier : MonoBehaviour
     private int CreatePointMarker(Vector3 pointPosition)
     {
         GameObject pm = Instantiate(Linepoint, pointPosition, Quaternion.identity, transform);
-        PointList.Add(pm);
+        listPoint.Add(pm);
 
         MovePointMarker mctrlpt = pm.GetComponent<MovePointMarker>();
-        mctrlpt.pointID = PointList.Count - 1;
+        mctrlpt.pointID = listPoint.Count - 1;
 
-        sizee = PointList[PointList.Count - 1].transform.position;
+        sizee = listPoint[listPoint.Count - 1].transform.position;
 
-        return PointList.Count;
+        return listPoint.Count;
     }
 
     private int AddControlPoint(Vector3 pointPosition)
     {
         GameObject cp = Instantiate(ControlPoint, pointPosition, Quaternion.identity, transform);
-        ControlPointList.Add(cp);
+        listControlPoint.Add(cp);
 
         MoveCtrlPt mctrlpt = cp.GetComponent<MoveCtrlPt>();
-        mctrlpt.pointID = ControlPointList.Count - 1;
+        mctrlpt.pointID = listControlPoint.Count - 1;
 
-        return ControlPointList.Count;
+        if (pointPosition == new Vector3(100, -100, 100))
+            cp.SetActive(false);
+
+        return listControlPoint.Count;
     }
 
     private int InsertControlPoint(Vector3 pointPosition, int id)
     {
         GameObject cp = Instantiate(ControlPoint, pointPosition, Quaternion.identity, transform);
-        ControlPointList.Insert(id, cp);
+        listControlPoint.Insert(id, cp);
 
         MoveCtrlPt mctrlpt = cp.GetComponent<MoveCtrlPt>();
         mctrlpt.pointID = id;
 
-        return ControlPointList.Count;
+        return listControlPoint.Count;
     }
 
-    public void MovePointMarker(int id, Vector3 pos)
+    public void MovePointMarker(int pointID, Vector3 pos)
     {
-        //don't move the first point....
-        oldPos = PointList[PointList.Count - 1].transform.position;
+        //issue : don't move the head point
+        oldPos = listPoint[listPoint.Count - 1].transform.position;
+        lineType = dicPointType[pointID];
+        //Debug.LogWarning("dd; " + lineType);
 
+        //editable none type
         switch (lineType)
         {
             case lineTypeList.straight:
-                if (id == 0)
-                {
-                }
+                if (pointID == 0)
+                    EditStraitghtCurve(pos, listPoint[pointID + 1].transform.position);
                 else
-                {
-                }
+                    EditStraitghtCurve(listPoint[pointID - 1].transform.position, pos);
                 break;
             case lineTypeList.curve:
-                if (id == 0) //start point
-                    editSingleCurve(pos, PointList[id + 1].transform.position, id, ControlPointList[id].transform.position);
-                else if(id == (PointList.Count - 1)) //end point
-                    editSingleCurve(PointList[id - 1].transform.position, pos, id - 1, ControlPointList[id - 1].transform.position);
+                if (pointID == 0) //start point
+                    EditSingleCurve(pos, listPoint[pointID + 1].transform.position, pointID, listControlPoint[pointID].transform.position);
+                else if(pointID == (listPoint.Count - 1)) //end point
+                    EditSingleCurve(listPoint[pointID - 1].transform.position, pos, pointID - 1, listControlPoint[pointID - 1].transform.position);
                 else //middle point
                 {
-                    editSingleCurve(PointList[id - 1].transform.position, pos, id - 1, ControlPointList[id - 1].transform.position);
-                    editSingleCurve(pos, PointList[id + 1].transform.position, id, ControlPointList[id].transform.position);
+                    EditSingleCurve(listPoint[pointID - 1].transform.position, pos, pointID - 1, listControlPoint[pointID - 1].transform.position);
+                    EditSingleCurve(pos, listPoint[pointID + 1].transform.position, pointID, listControlPoint[pointID].transform.position);
                 }
                 break;
             case lineTypeList.bezier:
-                if (id == 0) //start point
-                    editBezierCurve(pos, PointList[id + 1].transform.position, id, ControlPointList[0].transform.position, ControlPointList[1].transform.position);
-                else if (id == (PointList.Count - 1)) //end point
-                    editBezierCurve(PointList[id - 1].transform.position, pos, id - 1, ControlPointList[(id - 1) * 2].transform.position, ControlPointList[(id - 1) * 2 + 1].transform.position);
+                if (pointID == 0) //start point
+                    EditBezierCurve(pos, listPoint[pointID + 1].transform.position, pointID, listControlPoint[0].transform.position, listControlPoint[1].transform.position);
+                else if (pointID == (listPoint.Count - 1)) //end point
+                    EditBezierCurve(listPoint[pointID - 1].transform.position, pos, pointID - 1, listControlPoint[(pointID - 1) * 2].transform.position, listControlPoint[(pointID - 1) * 2 + 1].transform.position);
                 else //middle point
                 {
-                    editBezierCurve(PointList[id - 1].transform.position, pos, id - 1, ControlPointList[(id - 1) * 2].transform.position, ControlPointList[(id - 1) * 2 + 1].transform.position);
-                    editBezierCurve(pos, PointList[id + 1].transform.position, id, ControlPointList[id * 2].transform.position, ControlPointList[id * 2 + 1].transform.position);
+                    EditBezierCurve(listPoint[pointID - 1].transform.position, pos, pointID - 1, listControlPoint[(pointID - 1) * 2].transform.position, listControlPoint[(pointID - 1) * 2 + 1].transform.position);
+                    EditBezierCurve(pos, listPoint[pointID + 1].transform.position, pointID, listControlPoint[pointID * 2].transform.position, listControlPoint[pointID * 2 + 1].transform.position);
                 }
                 break;
         }
-        Debug.Log("MovePointMarker : " + id + " / " + pos);
+        //Debug.Log("MovePointMarker : " + id + " / " + pos);
     }
 
-    public void MoveControlPoint(int id, Vector3 pos)
+    public void MoveControlPoint(int ctrlID, Vector3 pos)
     {
-        switch (lineType)
+        switch (lineType) //##
         {
+            case lineTypeList.straight: //straight doesn't have ctr point
+                break;
             case lineTypeList.curve:
-                editSingleCurve(PointList[id].transform.position, PointList[id + 1].transform.position, id, pos);
+                EditSingleCurve(listPoint[ctrlID].transform.position, listPoint[ctrlID + 1].transform.position, ctrlID, pos);
                 break;
             case lineTypeList.bezier:
-                editBezierCurve(PointList[id / 2].transform.position, PointList[id / 2 + 1].transform.position, id / 2, ControlPointList[(id % 2 == 0) ? id : (id - 1)].transform.position, ControlPointList[(id % 2 == 0) ? (id + 1) : id].transform.position);
+
+                EditBezierCurve(listPoint[ctrlID / 2].transform.position, listPoint[ctrlID / 2 + 1].transform.position, ctrlID / 2, listControlPoint[(ctrlID % 2 == 0) ? ctrlID : (ctrlID - 1)].transform.position, listControlPoint[(ctrlID % 2 == 0) ? (ctrlID + 1) : ctrlID].transform.position);
                 break;
         }
-        Debug.Log("MoveControlPoint : " + id + " / " + pos);
+        //Debug.Log("MoveControlPoint : " + id + " / " + pos);
     }
 
-    private void drawBezierCurve(Vector3 p1, Vector3 p2) //add point limit 500
+    private void DrawStraitghtCurve(Vector3 p1, Vector3 p2)
+    {
+        lineRenderer.positionCount+=2;
+        
+        AddControlPoint(new Vector3(100, -100, 100)); //handle 1
+        
+        pos[addWeight] = p1;
+        pos[addWeight+1] = p2;
+
+        lineRenderer.SetPositions(pos);
+    }
+
+    private void DrawBezierCurve(Vector3 p1, Vector3 p2) //add point limit 500
     {
         Vector3 CtrlPt1, CtrlPt2;
         CtrlPt1.z = 0;
@@ -172,18 +218,14 @@ public class Bezier : MonoBehaviour
         for (int i = 1; i < numpos - 1; i++)
         {
             lineRenderer.positionCount++;
-            pos[(i - 1 + addWeight) + (numpos * (PointList.Count - 2))] = getcubemapoint((float)((float)i / (float)numpos), p1, CtrlPt1, CtrlPt2, p2);
-            pos[(i - 1 + addWeight) + (numpos * (PointList.Count - 2))].z = 0;
-
-            lineRenderer.SetPosition(i + addWeight, pos[(i - 1 + addWeight) + (numpos * (PointList.Count - 2))]);
+            pos[(i - 1 + addWeight) + (numpos * (listPoint.Count - 2))] = Getcubemapoint((float)((float)i / (float)numpos), p1, CtrlPt1, CtrlPt2, p2);
+            lineRenderer.SetPosition(i + addWeight, pos[(i - 1 + addWeight) + (numpos * (listPoint.Count - 2))]);
         }
         lineRenderer.positionCount++;
         lineRenderer.SetPosition(numpos - 1 + addWeight, p2);
-
-        addWeight += numpos; //eg 0, 20, 40 ...
     }
 
-    private void drawSingleCurve(Vector3 p1, Vector3 p2) //add point limit 500
+    private void DrawSingleCurve(Vector3 p1, Vector3 p2) //add point limit 500
     {
         //point of control
         Vector3 CtrlPt;
@@ -201,50 +243,53 @@ public class Bezier : MonoBehaviour
         for (int i = 1; i < numpos - 1; i++) //add new point only
         {
             lineRenderer.positionCount++;
-            pos[(i - 1 + addWeight) + (numpos * (PointList.Count - 2))] = getquadmapoint((float)((float)i / (float)numpos), p1, p2, CtrlPt);
-            pos[(i - 1 + addWeight) + (numpos * (PointList.Count - 2))].z = 0;
-
-            lineRenderer.SetPosition(i + addWeight, pos[(i - 1 + addWeight) + (numpos * (PointList.Count - 2))]);
+            pos[(i - 1 + addWeight) + (numpos * (listPoint.Count - 2))] = Getquadmapoint((float)((float)i / (float)numpos), p1, p2, CtrlPt);
+            lineRenderer.SetPosition(i + addWeight, pos[(i - 1 + addWeight) + (numpos * (listPoint.Count - 2))]);
         }
 
         lineRenderer.positionCount++;
         lineRenderer.SetPosition(numpos - 1 + addWeight, p2);
-
-        addWeight += numpos; //eg 0, 20, 40 ...
     }
 
-    private void editSingleCurve(Vector3 p1, Vector3 p2, int whichseg, Vector3 CtrlPt)
+    private void EditStraitghtCurve(Vector3 p1, Vector3 p2)
+    {
+        Debug.LogWarning("dd : " + p1 + " / " + p2);
+        Debug.LogWarning("aa : " + addWeight);
+
+
+        //get own id
+        //reduce addWeight
+
+        return;
+
+        pos[addWeight] = p1; 
+        pos[addWeight + 1] = p2;
+
+        lineRenderer.SetPositions(pos);
+    }
+
+    private void EditSingleCurve(Vector3 p1, Vector3 p2, int whichseg, Vector3 CtrlPt)
     {
         for (int i = 1; i <= numpos; i++)
         {
-            pos[(i - 1) + (numpos * whichseg)] = getquadmapoint((float)((float)i / (float)numpos), p1, p2, CtrlPt);
+            pos[(i - 1) + (numpos * whichseg)] = Getquadmapoint((float)((float)i / (float)numpos), p1, p2, CtrlPt);
             pos[(i - 1) + (numpos * whichseg)].z = 0;
         }
         lineRenderer.SetPositions(pos);
-        //lineRenderer.SetPosition(0, PointList[id]);
+        //lineRenderer.SetPosition(0, listPoint[id]);
     }
 
-    private void editBezierCurve(Vector3 p1, Vector3 p2, int whichseg, Vector3 CtrlPt1, Vector3 CtrlPt2)
+    private void EditBezierCurve(Vector3 p1, Vector3 p2, int whichseg, Vector3 CtrlPt1, Vector3 CtrlPt2)
     {
         for (int i = 1; i <= numpos; i++)
         {
-            pos[(i - 1) + (numpos * whichseg)] = getcubemapoint((float)((float)i / (float)numpos), p1, CtrlPt1, CtrlPt2, p2);
+            pos[(i - 1) + (numpos * whichseg)] = Getcubemapoint((float)((float)i / (float)numpos), p1, CtrlPt1, CtrlPt2, p2);
             pos[(i - 1) + (numpos * whichseg)].z = 0;
         }
         lineRenderer.SetPositions(pos);
     }
 
-    private void drawLinearCurve(Vector3 p1, Vector3 p2)
-    {
-        for (int i = 1; i <= numpos; i++)
-        {
-            pos[(i - 1) + numpos * (PointList.Count - 1)] = getmapoint((float)((float)i / (float)numpos), p1, p2);
-            pos[(i - 1) + numpos * (PointList.Count - 1)].z = 0;
-        }
-        lineRenderer.SetPositions(pos);
-    }
-
-    private Vector3 getmapoint(float t, Vector3 p1, Vector3 p2)
+    private Vector3 Getmapoint(float t, Vector3 p1, Vector3 p2)
     {
         Vector3 returnpoint;
         returnpoint.x = p1.x + t * (p2.x - p1.x);
@@ -254,7 +299,7 @@ public class Bezier : MonoBehaviour
         return returnpoint;
     }
 
-    private Vector3 getquadmapoint(float t, Vector3 p1, Vector3 p2, Vector3 controlPoint)
+    private Vector3 Getquadmapoint(float t, Vector3 p1, Vector3 p2, Vector3 controlPoint)
     {
         float u = 1 - t;
         float tt = t * t;
@@ -266,7 +311,7 @@ public class Bezier : MonoBehaviour
         return p;
     }
 
-    private Vector3 getcubemapoint(float t, Vector3 start, Vector3 ctrl1, Vector3 ctrl2, Vector3 end)
+    private Vector3 Getcubemapoint(float t, Vector3 start, Vector3 ctrl1, Vector3 ctrl2, Vector3 end)
     {
         float u = 1 - t;
         float tt = t * t;
@@ -283,10 +328,13 @@ public class Bezier : MonoBehaviour
 
     public void Clear()
     {
-        PointList.Clear();
-        ControlPointList.Clear();
+        addWeight = 0;
+        listPoint.Clear();
+        listControlPoint.Clear();
         pos = null;
         pos = new Vector3[maxpoints];
+
+        lineRenderer.positionCount = 0;
 
         for (int i = 0; i < this.transform.childCount; i++)
             Destroy(this.transform.GetChild(i).gameObject);

@@ -156,8 +156,8 @@ MonoBehaviour:
     type: 3}
   ControlPoint: {fileID: 5566023829335022077, guid: 74784f579869349a990f86bb188f1c21,
     type: 3}
-  PointList: []
-  ControlPointList: []
+  listPoint: []
+  listControlPoint: []
   sizee: {x: 0, y: 0, z: 0}
   newPos: {x: 0, y: 0, z: 0}
   oldPos: {x: 0, y: 0, z: 0}
@@ -397,7 +397,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 10, y: -10}
-  m_SizeDelta: {x: 200, y: 180}
+  m_SizeDelta: {x: 333, y: 111}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &170527425
 MonoBehaviour:
@@ -425,13 +425,13 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 3
     m_MaxSize: 40
-    m_Alignment: 0
+    m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: '1 : straight
+  m_Text: '1 : straight (not yet)
 
     2 : curve
 
@@ -538,7 +538,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 10
   field of view: 60
   orthographic: 1
   orthographic size: 5
@@ -565,7 +565,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 534669902}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 1, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
