@@ -326,11 +326,15 @@ public class Bezier : MonoBehaviour
         return p;
     }
 
-    public void Clear()
+    public void ResetStatus()
     {
+        lineType = lineTypeList.none;
         addWeight = 0;
+        
         listPoint.Clear();
         listControlPoint.Clear();
+        dicPointType.Clear();
+
         pos = null;
         pos = new Vector3[maxpoints];
 
