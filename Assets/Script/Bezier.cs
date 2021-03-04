@@ -23,6 +23,10 @@ public class Bezier : MonoBehaviour
     public Vector3 newPos, oldPos;
     private Vector3[] pos;
 
+    Ray ray;
+    RaycastHit hit;
+    Camera cam;
+
 
     // Start is called before the first frame update
     void Start()
@@ -33,11 +37,16 @@ public class Bezier : MonoBehaviour
         lineRenderer.positionCount = 0;
         lineRenderer.startWidth = 0.1f;
         lineRenderer.endWidth = 0.1f;
+
+        cam = Camera.main;
     }
 
     // Update is called once per frame
     void Update()
     {
+        //ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //Debug.DrawRay(ray.origin, ray.direction * 10f, Color.red, 2f);
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             //for debug
@@ -49,8 +58,11 @@ public class Bezier : MonoBehaviour
             if (lineType == lineTypeList.none)
                 return;
 
-            newPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //newPos = Camera.main.ScreenToWorldPoint(Input.mousePosition); //orthographic
+            newPos = Camera.main.ScreenPointToRay(Input.mousePosition).GetPoint(Mathf.Abs(cam.transform.localPosition.z)); //perspective
             newPos.z = 0;
+
+            Debug.LogWarning("dd : " + newPos);
 
             if(dicPointType.Count == 0) //head point
                 dicPointType.Add(cntDraw, lineType);
