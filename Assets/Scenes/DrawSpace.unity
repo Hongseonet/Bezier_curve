@@ -382,6 +382,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bezier: {fileID: 86127982}
+  txtIndicator: {fileID: 170527425}
 --- !u!4 &439470009
 Transform:
   m_ObjectHideFlags: 0

@@ -372,5 +372,7 @@ public class Bezier : MonoBehaviour
                 lineType = lineTypeList.bezier;
                 break;
         }
+
+        GameObject.Find("/Script").GetComponent<TestScript>().SetIndicator(type);
     }
 }
