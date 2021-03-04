@@ -28,6 +28,6 @@ public class MoveCtrlPt : MonoBehaviour
     {
         transform.position = GetMouseWorldPos() + mOffset;
         bezier = transform.parent.GetComponent<Bezier>();
-        bezier.MoveControlPoint(pointID, transform.position);
+        bezier.MoveControlPoint(pointID, this.transform);
     }
 }
