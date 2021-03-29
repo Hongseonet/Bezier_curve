@@ -151,7 +151,6 @@ namespace RuntimeGizmos
 
         void Update()
         {
-
             SetSpaceAndType();
 
             if (manuallyHandleGizmo)
@@ -159,9 +158,7 @@ namespace RuntimeGizmos
                 if (onCheckForSelectedAxis != null) onCheckForSelectedAxis();
             }
             else
-            {
                 SetNearAxis();
-            }
 
             GetTarget();
 
@@ -377,6 +374,7 @@ namespace RuntimeGizmos
                         }
                         else
                         {
+                            //## moveSpeedMultiplier
                             float moveAmount = ExtVector3.MagnitudeInDirection(mousePosition - previousMousePosition, projectedAxis) * moveSpeedMultiplier;
                             movement = axis * moveAmount;
                         }
@@ -472,6 +470,11 @@ namespace RuntimeGizmos
 
                 previousMousePosition = mousePosition;
 
+                //
+                Debug.LogWarning("dd : " + mainTargetRoot.name);
+                if (mainTargetRoot.GetComponent<MovePointMarker>() != null)
+                    mainTargetRoot.GetComponent<MovePointMarker>().OnMouseDrag();
+
                 yield return null;
             }
 
@@ -481,6 +484,8 @@ namespace RuntimeGizmos
             SetTranslatingAxis(transformType, Axis.None);
 
             SetPivotPoint();
+
+            
         }
 
         Vector3 GetNearAxisDirection()
