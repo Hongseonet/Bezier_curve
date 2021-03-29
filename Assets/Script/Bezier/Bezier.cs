@@ -32,24 +32,30 @@ public class Bezier : MonoBehaviour
     void Start()
     {
         pos = new Vector3[maxpoints];
-        lineType = lineTypeList.none;
+
+        //lineType = lineTypeList.none;
+        lineType = lineTypeList.curve;
 
         lineRenderer.positionCount = 0;
         lineRenderer.startWidth = 0.1f;
         lineRenderer.endWidth = 0.1f;
 
         cam = Camera.main;
+
+        GetComponentInParent<DrawManager>().BezierIdx = transform.GetSiblingIndex();
+        Debug.LogWarning("dd : " + GetComponentInParent<DrawManager>().BezierIdx);
     }
+
 
     // Update is called once per frame
     void Update()
     {
-        //ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //Debug.DrawRay(ray.origin, ray.direction * 10f, Color.red, 2f);
+        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.red, 2f);
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            //for debug
+            //for dev
             foreach(KeyValuePair<int, lineTypeList> abc in dicPointType)
                 Debug.Log("a : " + abc.Key + " / " + abc.Value);
         }
@@ -63,8 +69,11 @@ public class Bezier : MonoBehaviour
             newPos.z = 0;
             //Debug.LogWarning("dd : " + newPos);
 
-            if(dicPointType.Count == 0) //head point
+            if (dicPointType.Count == 0) //head point
+            {
+                Debug.Log("create new header");
                 dicPointType.Add(cntDraw, lineType);
+            }
 
             if (CreatePointMarker(newPos) > 1)
             {
@@ -95,11 +104,20 @@ public class Bezier : MonoBehaviour
             }
             oldPos = newPos;
         }
+        else if (Input.GetMouseButtonDown(1)) //end draw line
+        {
+            lineType = lineTypeList.none;
+            pos.Initialize();
+
+            transform.GetComponentInParent<DrawManager>().BezierIdx = -1;
+            transform.GetComponentInParent<DrawManager>().RefBezier = null; //release
+        }
     }
 
     private int CreatePointMarker(Vector3 pointPosition)
     {
         GameObject pm = Instantiate(Linepoint, pointPosition, Quaternion.identity, transform);
+        pm.SetActive(true);
         listPoint.Add(pm);
 
         MovePointMarker mctrlpt = pm.GetComponent<MovePointMarker>();
@@ -113,6 +131,7 @@ public class Bezier : MonoBehaviour
     private int AddControlPoint(Vector3 pointPosition)
     {
         GameObject cp = Instantiate(ControlPoint, pointPosition, Quaternion.identity, transform);
+        cp.SetActive(true);
         listControlPoint.Add(cp);
 
         MoveCtrlPt mctrlpt = cp.GetComponent<MoveCtrlPt>();
@@ -127,6 +146,7 @@ public class Bezier : MonoBehaviour
     private int InsertControlPoint(Vector3 pointPosition, int id)
     {
         GameObject cp = Instantiate(ControlPoint, pointPosition, Quaternion.identity, transform);
+        cp.SetActive(true);
         listControlPoint.Insert(id, cp);
 
         MoveCtrlPt mctrlpt = cp.GetComponent<MoveCtrlPt>();
@@ -193,6 +213,7 @@ public class Bezier : MonoBehaviour
         //Debug.Log("MoveControlPoint : " + id + " / " + pos);
     }
 
+    #region draw line
     private void DrawStraitghtCurve(Vector3 p1, Vector3 p2)
     {
         lineRenderer.positionCount+=2;
@@ -204,7 +225,6 @@ public class Bezier : MonoBehaviour
 
         lineRenderer.SetPositions(pos);
     }
-
     private void DrawBezierCurve(Vector3 p1, Vector3 p2) //add point limit 500
     {
         Vector3 CtrlPt1, CtrlPt2;
@@ -234,7 +254,6 @@ public class Bezier : MonoBehaviour
         lineRenderer.positionCount++;
         lineRenderer.SetPosition(numpos - 1 + addWeight, p2);
     }
-
     private void DrawSingleCurve(Vector3 p1, Vector3 p2) //add point limit 500
     {
         //point of control
@@ -260,7 +279,9 @@ public class Bezier : MonoBehaviour
         lineRenderer.positionCount++;
         lineRenderer.SetPosition(numpos - 1 + addWeight, p2);
     }
+    #endregion
 
+    #region edit line
     private void EditStraitghtCurve(Vector3 p1, Vector3 p2)
     {
         Debug.LogWarning("dd : " + p1 + " / " + p2);
@@ -301,6 +322,8 @@ public class Bezier : MonoBehaviour
         }
         //lineRenderer.SetPositions(pos);
     }
+    #endregion
+
 
     private Vector3 Getmapoint(float t, Vector3 p1, Vector3 p2)
     {
@@ -373,6 +396,6 @@ public class Bezier : MonoBehaviour
                 break;
         }
 
-        GameObject.Find("/Script").GetComponent<TestScript>().SetIndicator(type);
+        //GameObject.Find("/Script").GetComponent<TestScript>().SetIndicator(type);
     }
 }

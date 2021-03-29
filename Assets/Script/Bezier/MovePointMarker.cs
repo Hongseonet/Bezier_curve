@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class MoveCtrlPt : MonoBehaviour
+public class MovePointMarker : MonoBehaviour
 {
     private Vector3 mOffset;
     private float mZCoord;
@@ -11,14 +9,18 @@ public class MoveCtrlPt : MonoBehaviour
     Bezier bezier;
 
 
-    private void OnMouseDown() {
+    private void OnMouseDown()
+    {
         mZCoord = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
         mOffset = gameObject.transform.position - GetMouseWorldPos();
 
-        Debug.LogWarning("MoveCtrlPt : " + pointID);
+        //Debug.LogWarning("MovePointMarker : " + gameObject.name);
+        Debug.Log("MovePointMarker : " + transform.GetComponentInParent<DrawManager>().BezierIdx + " / " + pointID);
+        transform.GetComponentInParent<DrawManager>().RefBezier = transform.GetComponentInParent<Bezier>().gameObject;
     }
 
-    private Vector3 GetMouseWorldPos() {
+    private Vector3 GetMouseWorldPos()
+    {
         Vector3 mousePoint = Input.mousePosition;
         mousePoint.z = mZCoord;
         return Camera.main.ScreenToWorldPoint(mousePoint);
@@ -28,6 +30,6 @@ public class MoveCtrlPt : MonoBehaviour
     {
         transform.position = GetMouseWorldPos() + mOffset;
         bezier = transform.parent.GetComponent<Bezier>();
-        bezier.MoveControlPoint(pointID, this.transform);
+        bezier.MovePointMarker(pointID, transform.position);
     }
 }
