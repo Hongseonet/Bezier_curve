@@ -40,7 +40,11 @@ public class DrawManager : MonoBehaviour
         else if(Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift))
         {
             if (refBezier == null)
+            {
                 refBezier = Instantiate(bezier.gameObject, transform);
+                //set default posi
+
+            }
         }
     }
 

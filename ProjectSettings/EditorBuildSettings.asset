@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DrawSpace.unity
     guid: 11ee0ba5383504a7788893d1e06587b0
   m_configObjects: {}
