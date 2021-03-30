@@ -9,7 +9,7 @@ BoxCollider:
   m_GameObject: {fileID: 2800182811276999467}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.2, y: 0.2, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
@@ -22,7 +22,7 @@ BoxCollider:
   m_GameObject: {fileID: 4683468851247045329}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.2, y: 0.2, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
@@ -371,6 +371,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7773848752063452410}
     m_Modifications:
+    - target: {fileID: 2409472627999907643, guid: c128e02cd46ad423a898969823fd553a,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2814693769600793244, guid: c128e02cd46ad423a898969823fd553a,
         type: 3}
       propertyPath: m_Enabled
@@ -526,6 +531,11 @@ PrefabInstance:
     - target: {fileID: 5566023829335022077, guid: 74784f579869349a990f86bb188f1c21,
         type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8498133194793235501, guid: 74784f579869349a990f86bb188f1c21,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
