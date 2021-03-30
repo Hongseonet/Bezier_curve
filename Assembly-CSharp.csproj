@@ -67,6 +67,7 @@
     <Compile Include="Assets\Script\Bezier\Bezier.cs" />
     <Compile Include="Assets\Script\Bezier\MoveCtrlPt.cs" />
     <Compile Include="Assets\Script\Bezier\MovePointMarker.cs" />
+    <Compile Include="Assets\Script\Bezier\TestEvent.cs" />
     <Compile Include="Assets\Script\Common\Common.cs" />
     <Compile Include="Assets\Script\Common\MonoSingleton.cs" />
     <Compile Include="Assets\Script\DrawManager.cs" />

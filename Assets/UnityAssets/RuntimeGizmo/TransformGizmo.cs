@@ -470,7 +470,7 @@ namespace RuntimeGizmos
 
                 previousMousePosition = mousePosition;
 
-                //
+                //for bezier event
                 //Debug.LogWarning("dd : " + mainTargetRoot.name);
                 if (mainTargetRoot.GetComponent<MovePointMarker>() != null)
                     mainTargetRoot.GetComponent<MovePointMarker>().OnMouseDrag();
@@ -486,8 +486,6 @@ namespace RuntimeGizmos
             SetTranslatingAxis(transformType, Axis.None);
 
             SetPivotPoint();
-
-            
         }
 
         Vector3 GetNearAxisDirection()
