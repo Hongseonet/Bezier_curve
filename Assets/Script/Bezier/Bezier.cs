@@ -64,10 +64,22 @@ public class Bezier : MonoBehaviour
             if (lineType == lineTypeList.none)
                 return;
 
-            //newPos = Camera.main.ScreenToWorldPoint(Input.mousePosition); //orthographic
-            newPos = Camera.main.ScreenPointToRay(Input.mousePosition).GetPoint(Mathf.Abs(cam.transform.localPosition.z)); //perspective
-            newPos.z = 0;
-            //Debug.LogWarning("dd : " + newPos);
+            //newPos = Camera.main.ScreenToWorldPoint(Input.mousePosition); //orthographic cam only
+            //newPos = Camera.main.ScreenPointToRay(Input.mousePosition).GetPoint(Mathf.Abs(cam.transform.localPosition.z)); //perspective cam only
+
+            if(Physics.Raycast(ray, out hit, Mathf.Infinity))
+            {
+                Debug.Log("hit posi " + hit.point);
+                newPos = hit.point;
+
+                GameObject abc = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                abc.transform.localPosition = hit.point;
+            }
+            
+            if(Common.ISDRAWORTHO)
+                newPos.z = 0; //when use for customize
+
+            //Debug.Log("created point posi : " + newPos);
 
             if (dicPointType.Count == 0) //head point
             {
@@ -116,11 +128,11 @@ public class Bezier : MonoBehaviour
 
     private int CreatePointMarker(Vector3 pointPosition)
     {
-        GameObject pm = Instantiate(Linepoint, pointPosition, Quaternion.identity, transform);
-        pm.SetActive(true);
-        listPoint.Add(pm);
+        GameObject pointMarker = Instantiate(Linepoint, pointPosition, Quaternion.identity, transform);
+        pointMarker.SetActive(true);
+        listPoint.Add(pointMarker);
 
-        MovePointMarker mctrlpt = pm.GetComponent<MovePointMarker>();
+        MovePointMarker mctrlpt = pointMarker.GetComponent<MovePointMarker>();
         mctrlpt.pointID = listPoint.Count - 1;
 
         sizee = listPoint[listPoint.Count - 1].transform.position;
@@ -130,26 +142,26 @@ public class Bezier : MonoBehaviour
 
     private int AddControlPoint(Vector3 pointPosition)
     {
-        GameObject cp = Instantiate(ControlPoint, pointPosition, Quaternion.identity, transform);
-        cp.SetActive(true);
-        listControlPoint.Add(cp);
+        GameObject controlPoint = Instantiate(ControlPoint, pointPosition, Quaternion.identity, transform);
+        controlPoint.SetActive(true);
+        listControlPoint.Add(controlPoint);
 
-        MoveCtrlPt mctrlpt = cp.GetComponent<MoveCtrlPt>();
+        MoveCtrlPt mctrlpt = controlPoint.GetComponent<MoveCtrlPt>();
         mctrlpt.pointID = listControlPoint.Count - 1;
 
         if (pointPosition == new Vector3(100, -100, 100))
-            cp.SetActive(false);
+            controlPoint.SetActive(false);
 
         return listControlPoint.Count;
     }
 
     private int InsertControlPoint(Vector3 pointPosition, int id)
     {
-        GameObject cp = Instantiate(ControlPoint, pointPosition, Quaternion.identity, transform);
-        cp.SetActive(true);
-        listControlPoint.Insert(id, cp);
+        GameObject controlPoint = Instantiate(ControlPoint, pointPosition, Quaternion.identity, transform);
+        controlPoint.SetActive(true);
+        listControlPoint.Insert(id, controlPoint);
 
-        MoveCtrlPt mctrlpt = cp.GetComponent<MoveCtrlPt>();
+        MoveCtrlPt mctrlpt = controlPoint.GetComponent<MoveCtrlPt>();
         mctrlpt.pointID = id;
 
         return listControlPoint.Count;
@@ -228,16 +240,18 @@ public class Bezier : MonoBehaviour
     private void DrawBezierCurve(Vector3 p1, Vector3 p2) //add point limit 500
     {
         Vector3 CtrlPt1, CtrlPt2;
-        CtrlPt1.z = 0;
+        //CtrlPt1.z = 0;
         //CtrlPt1.x = ((float)((p1.x + p2.x + 1.7320508076 * (p1.y - p2.y)) / 2));
         //CtrlPt1.y = ((float)((p1.y + p2.y + 1.7320508076 * (p2.x - p1.x)) / 2));
         CtrlPt1.x = Vector3.Lerp(p1, p2, 0.25f).x;
         CtrlPt1.y = Vector3.Lerp(p1, p2, 0.25f).y;
+        CtrlPt1.z = Vector3.Lerp(p1, p2, 0.25f).z;
 
         CtrlPt2 = CtrlPt1;
         //CtrlPt2.x += 2;
         CtrlPt2.x = Vector3.Lerp(p1, p2, 0.75f).x;
         CtrlPt2.y = Vector3.Lerp(p1, p2, 0.75f).y;
+        CtrlPt2.z = Vector3.Lerp(p1, p2, 0.75f).z;
 
         AddControlPoint(CtrlPt1); //handle 1
         AddControlPoint(CtrlPt2); //handle 2
@@ -258,11 +272,12 @@ public class Bezier : MonoBehaviour
     {
         //point of control
         Vector3 CtrlPt;
-        CtrlPt.z = 0f;
+        //CtrlPt.z = 0f;
         //CtrlPt.x = ((float)((p1.x + p2.x + 1.7320508076 * (p1.y - p2.y)) / 2));
         //CtrlPt.y = ((float)((p1.y + p2.y + 1.7320508076 * (p2.x - p1.x)) / 2));
         CtrlPt.x = Vector3.Lerp(p1, p2, 0.5f).x;
         CtrlPt.y = Vector3.Lerp(p1, p2, 0.5f).y;
+        CtrlPt.z = Vector3.Lerp(p1, p2, 0.5f).z;
 
         AddControlPoint(CtrlPt); //handle
 

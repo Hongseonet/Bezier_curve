@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class DrawManager : MonoBehaviour
 {
+    [SerializeField] bool isDrawOrtho;
     [SerializeField] Text txtIndicator;
     [SerializeField] Bezier bezier;
 
@@ -13,6 +14,11 @@ public class DrawManager : MonoBehaviour
 
     double bezierIdx = -1; //current bezier index
 
+
+    private void Start()
+    {
+        Common.ISDRAWORTHO = isDrawOrtho;
+    }
 
     public double BezierIdx
     {
@@ -43,7 +49,6 @@ public class DrawManager : MonoBehaviour
             {
                 refBezier = Instantiate(bezier.gameObject, transform);
                 //set default posi
-
             }
         }
     }
