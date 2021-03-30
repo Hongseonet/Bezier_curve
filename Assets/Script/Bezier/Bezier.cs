@@ -69,11 +69,11 @@ public class Bezier : MonoBehaviour
 
             if(Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
-                Debug.Log("hit posi " + hit.point);
+                //Debug.Log("hit posi " + hit.point);
                 newPos = hit.point;
 
-                GameObject abc = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                abc.transform.localPosition = hit.point;
+                //GameObject abc = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                //abc.transform.localPosition = hit.point;
             }
             
             if(Common.ISDRAWORTHO)
@@ -83,14 +83,13 @@ public class Bezier : MonoBehaviour
 
             if (dicPointType.Count == 0) //head point
             {
-                Debug.Log("create new header");
+                Common.Instance.DebugPrint('c', "create new header", "create new header");
                 dicPointType.Add(cntDraw, lineType);
             }
 
             if (CreatePointMarker(newPos) > 1)
             {
-                Debug.Log("create new point");
-                
+                Common.Instance.DebugPrint('c', "create new point", "create new point");
                 //add lineType on hashmap
                 cntDraw++;
                 dicPointType.Add(cntDraw, lineType);

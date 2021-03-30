@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class DrawManager : MonoBehaviour
 {
-    [SerializeField] bool isDrawOrtho;
+    [SerializeField] bool isDev, isDrawOrtho;
     [SerializeField] Text txtIndicator;
     [SerializeField] Bezier bezier;
 
@@ -17,6 +17,7 @@ public class DrawManager : MonoBehaviour
 
     private void Start()
     {
+        Common.ISDEV = isDev;
         Common.ISDRAWORTHO = isDrawOrtho;
     }
 
