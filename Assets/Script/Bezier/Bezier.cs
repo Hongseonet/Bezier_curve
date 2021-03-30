@@ -304,8 +304,6 @@ public class Bezier : MonoBehaviour
         for (int i = 1; i <= numpos; i++)
         {
             pos[(i - 1) + (numpos * whichseg)] = Getquadmapoint((float)((float)i / (float)numpos), p1, p2, CtrlPt.transform.position);
-            pos[(i - 1) + (numpos * whichseg)].z = 0;
-
             lineRenderer.SetPosition((i - 1) + (numpos * whichseg), pos[(i - 1) + (numpos * whichseg)]);
         }
         //lineRenderer.SetPositions(pos);
@@ -316,8 +314,6 @@ public class Bezier : MonoBehaviour
         for (int i = 1; i <= numpos; i++)
         {
             pos[(i - 1) + (numpos * whichseg)] = Getcubemapoint((float)((float)i / (float)numpos), p1, CtrlPt1.transform.position, CtrlPt2.transform.position, p2);
-            pos[(i - 1) + (numpos * whichseg)].z = 0;
-
             lineRenderer.SetPosition((i - 1) + (numpos * whichseg), pos[(i - 1) + (numpos * whichseg)]);
         }
         //lineRenderer.SetPositions(pos);
@@ -330,7 +326,8 @@ public class Bezier : MonoBehaviour
         Vector3 returnpoint;
         returnpoint.x = p1.x + t * (p2.x - p1.x);
         returnpoint.y = p1.y + t * (p2.y - p1.y);
-        returnpoint.z = 0;
+        //returnpoint.z = 0;
+        returnpoint.z = p1.z + t * (p2.z - p1.z);
 
         return returnpoint;
     }

@@ -68,6 +68,7 @@
     <Compile Include="Assets\Script\Bezier\BezierManager.cs" />
     <Compile Include="Assets\Script\Bezier\MoveCtrlPt.cs" />
     <Compile Include="Assets\Script\Bezier\MovePointMarker.cs" />
+    <Compile Include="Assets\Script\Common\Common.cs" />
     <Compile Include="Assets\Script\Common\MonoSingleton.cs" />
     <Compile Include="Assets\Script\DrawManager.cs" />
     <Compile Include="Assets\UnityAssets\RuntimeGizmo\Custom\TransformGizmoCustomGizmo.cs" />
