@@ -471,9 +471,11 @@ namespace RuntimeGizmos
                 previousMousePosition = mousePosition;
 
                 //
-                Debug.LogWarning("dd : " + mainTargetRoot.name);
+                //Debug.LogWarning("dd : " + mainTargetRoot.name);
                 if (mainTargetRoot.GetComponent<MovePointMarker>() != null)
                     mainTargetRoot.GetComponent<MovePointMarker>().OnMouseDrag();
+                else if(mainTargetRoot.GetComponent<MoveCtrlPt>() != null)
+                    mainTargetRoot.GetComponent<MoveCtrlPt>().OnMouseDrag();
 
                 yield return null;
             }

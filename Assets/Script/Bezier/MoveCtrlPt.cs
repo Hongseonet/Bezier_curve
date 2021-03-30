@@ -11,7 +11,7 @@ public class MoveCtrlPt : MonoBehaviour
     Bezier bezier;
 
 
-    private void OnMouseDown() {
+    public void OnMouseDown() {
         //mZCoord = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
         //mOffset = gameObject.transform.position - GetMouseWorldPos();
 
@@ -20,13 +20,13 @@ public class MoveCtrlPt : MonoBehaviour
         transform.GetComponentInParent<DrawManager>().RefBezier = transform.GetComponentInParent<Bezier>().gameObject;
     }
 
-    private Vector3 GetMouseWorldPos() {
+    public Vector3 GetMouseWorldPos() {
         Vector3 mousePoint = Input.mousePosition;
         //mousePoint.z = mZCoord;
         return Camera.main.ScreenToWorldPoint(mousePoint);
     }
 
-    private void OnMouseDrag()
+    public void OnMouseDrag()
     {
         //transform.position = GetMouseWorldPos() + mOffset;
         Vector3 mousePoint = transform.localPosition;
