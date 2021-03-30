@@ -65,7 +65,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Script\Bezier\Bezier.cs" />
-    <Compile Include="Assets\Script\Bezier\BezierManager.cs" />
     <Compile Include="Assets\Script\Bezier\MoveCtrlPt.cs" />
     <Compile Include="Assets\Script\Bezier\MovePointMarker.cs" />
     <Compile Include="Assets\Script\Common\Common.cs" />
