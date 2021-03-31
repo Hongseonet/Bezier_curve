@@ -83,13 +83,13 @@ public class Bezier : MonoBehaviour
 
             if (dicPointType.Count == 0) //head point
             {
-                Common.Instance.DebugPrint('c', "create new header", "create new header");
+                Common.Instance.PrintLog('c', "create new header", "create new header");
                 dicPointType.Add(cntDraw, lineType);
             }
 
             if (CreatePointMarker(newPos) > 1)
             {
-                Common.Instance.DebugPrint('c', "create new point", "create new point");
+                Common.Instance.PrintLog('c', "create new point", "create new point");
                 //add lineType on hashmap
                 cntDraw++;
                 dicPointType.Add(cntDraw, lineType);

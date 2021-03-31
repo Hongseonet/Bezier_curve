@@ -12,20 +12,22 @@ public class Common : MonoSingleton<Common>
         
     }
 
-    public void DebugPrint(char type, string grp, string msg)
+    public void PrintLog(char type, string msg1, string msg2)
     {
+        string str = msg1 + " : " + msg2;
+
         if (ISDEV)
         {
             switch (type)
             {
                 case 'w':
-                    Debug.LogWarning(grp + " : " + msg);
+                    Debug.LogWarning(str);
                     break;
                 case 'e':
-                    Debug.LogError(grp + " : " + msg);
+                    Debug.LogError(str);
                     break;
                 default:
-                    Debug.Log(grp + " : " + msg);
+                    Debug.Log(str);
                     break;
             }
         }
